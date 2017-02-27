@@ -1,0 +1,84 @@
+Emerson Fang
+CSCI E-15 Changelog Website.
+
+*9/19/2016 - I installed Drupal on the website, both locally and on the Acquia cloud site.  I also installed Drush.  Researching this workflow module before I possibly add it: https://www.drupal.org/project/workflow
+*9/26/2016 - Not too much done this week yet.  I installed Omega base theme, but have not enabled it yet--I want to research other base themes too.  Also need to update Drupal Core to 8.1.10 (security update), and install workflow module.
+*10/3/2016 - I updated Drupal Core to 8.1.10; in the process I realized that Windows and Drush 7.3.0 do not mix/are incompatible with Drupal 8--just did the Drupal core update manually without a drush terminal.  I installed/enabled (manually) a bunch of modules that I think might be useful--advanced_forum, workflow, webform, and omega, but testing the site locally on Windows is incredibly clunky and cumbersome, with slow load times, rendering issues, and Cygwin/drush incompatibilities.  Developing on Windows is inefficient; will try to install a Linux OS and work on the site with software from there.
+*10/17/2016 - Still have yet to get to the meat of things, but managed to install Linux and also Drupal locally, and was able to download drush 9.0 on Linux.  Figuring out how to use LAMPP stack on Linux (I'm just using XAMPP again, not sure how to do it all via command terminal), and attempting to link up my old local Windows drupal site database to the Linux one.  If this doesn't work, might try doing a fresh install of the whole site (git pull from Acquia cloud perhaps, and downloading the database onto a Linux directory to see if that works.  I have a copy of the local Windows drupal database on the Linux mysql server (LAMP stack?), but that mysql database directory doesn't have the ssh permissions that I set up to Acquia cloud.  A bit confusing for me, but somehow got the local site to render correctly on Linux and get drush to work locally too.  Apparently there is another Drupal update that I need to install too, so that needs to be done.
+*10/24/2016 - I updated Drupal Core to 8.2.10 using drush somehow.  However, now there is an error saying that that Drupal Core needs Drupal core version 8+ to run, and that drush command 'cr' can't be executed.  I need a higher bootstrap level to run, or something.  Also, after enabling a bunch of modules, the local site said I had to rebuild permissions, which I did... then this weird drush error came up.  I have drush version 9.0 on Linux.  Not sure what is wrong.  I think it might be a file permission thing to access the default folder in my sites directory locally? Maybe.  I will have to try that too.
+
+*10/30/2016 - Enabled devel modules, installed and enabled discussions module, since forum and advanced_forum don't appear to work on my version of Drupal 8.  Also created new vocabularies and terms locally for use in forums in article categorization.  Created a few hundred nodes in webform, article, forum topic, and profile content types.  Changed user permissions for forums and articles content types so that authenticated users could create their own forum topics and articles, but limited ability to delete their own content.  Administrators have full priveleges for CRUD for articles, forums, etc.  Also downloaded dev version of Rules, added arbitrary page redirect rule on saving new content (from lecture video)... but that rule won't save.  So I guess the Rules module doesn't work.  I'm not sure why.  I cleared the cache too; I am betting it's a config file permission thing?? Not sure.  I will keep moving on because I've spent too much time troubleshooting and not getting anything produced.  I uploaded the configuration file into dev... or attempted to, but then I got an error saying that I should go to the error page.  I clicked to to go to the error page but nothing is there.
+
+Configuration synchronization has encountered an error.
+Please continue to the error page
+
+An AJAX HTTP error occurred.
+HTTP Result Code: 500
+Debugging information follows.
+Path: /batch?id=16&op=do_nojs&op=do
+StatusText: Internal Server Error
+ResponseText: {}
+
+Instead of using the config suggestion in the video and using config-devel module, I used FTP to drag the contents of the sync folder from local to the devel, then clicked synchronize and configuration and synchronized the changes that way... it seemed to work okay.  The database needed to be updated too on the development site... I might try to import the database into my local again.   I will look into that, since I want everything to match up.
+
+Actually, apparently I'm supposed to be making all my content on the live site... I must have been doing this backwards.
+
+I updated the database in the live stage, since the status report said it apparently needed it.
+
+I received a message that said--
+
+"The following updates returned messages:
+comment module
+Update #8200
+
+    entity displays updated: node.article.default."
+
+Also, the live site is not refreshing with the updates... even though Dev has them.  Don't understand why the themes, content, and files are not updating.  Maybe I will sleep on it and check again tomorrow... not sure how long it takes changes to take effect on stage.
+
+11/7/2016 - I updated Drupal Core to 8.2.2, at least locally.  I updated the Acquia Cloud public site by dragging database from dev to stage, since nothing is really on stage, this seemed to fix up the issue I had from last week, since I was unsure if I should drag database files up rather than down.  I tried logging into phpmyadmin, but got an error that it can't be world-write access, so I tried changing permissions on config.inc.php to 750, 755 or 600 something but none of that worked.  I tried to do a complete overwrite of the database to get the users and content I had on local, but that didn't work and it just started over from scratch making a new site and asking to install Drupal.  Dragged Code, Files, and Database down from stage afterward, but now commit has some random archive in the file (I messed up and was in the wrong directory when running the archive dump command in drush, and also my settings.php is out of sync with my local?  I get these errors:
+
+emerson@emerson-ThinkPad-T420:/opt/lampp/cscie15c/site/efangcscie15c/docroot$ git fetch origin
+emerson@emerson-ThinkPad-T420:/opt/lampp/cscie15c/site/efangcscie15c/docroot$ git reset --hard origin/master
+error: unable to unlink old 'docroot/sites/default/settings.php' (Permission denied)
+fatal: Could not reset index file to revision 'origin/master'.
+
+I tried to use filezilla to remove the files from the origin... 	.ah_site_archive_imported
+	mysite.tar.gz
+
+But couldn't find where those files were in the server.
+
+I'm doing the archive dump again and seeing how this goes... doesn't work, just asks me to do a fresh install of Drupal again.  I dragged the master trunk from stage to dev and all the files and DB down, and it fixed things.  I managed to find a way to use drush to force a sql dump onto the dev server and import it, then pushed the DB change to stage.  Just had to put stage out of maintenance mode and remove weird development-based theme features.  It looks a little buggy, but the content is all there on stage now.
+
+11/14/2016 - Added "People" view to my stage site.  Tried to add a related profiles view, based on what the video was showing, but that didn't work for some reason.  I added a related posts view using forum posts, and that seemed to work--when a user clicks on an article, related posts show up in a block to the left, used filtering criteria and relationships, but not sure how effectively I did that to filter down related views, since everything is all in fake Latin anyway... The point was to have people reading articles have the ability to see other related articles in the block, and click on that if it was pertinent.  Added a test view with custom text to customize the way that the last name and first name content showed up, but it looks like it's all long lengths of Latin text; can't really rewrite the DB to shorten the string limits for these things (and actually not sure how to do that manually); I will leave that and not play with the DB anymore, since it will probably mess things up further if I do.  Anyway, it seems that I was able to use Twig somewhat appropriately based on what was in the video.
+
+Tried to make content with Bridge related terms to test the filtering, but I'm not sure how to relate what I write to other pre-existing fake Latin articles, or other articles I might write later.  The tags are non-existent, and in webforum, any article topic I choose apparently "doesn't have a reference" in the DB.  I.e. choosing a random Latin term in the "forums" pull down menu results in an error that says: "This entity (taxonomy_term: 801) cannot be referenced."  I'm going to move onto paneling, since I feel so behind.  I'm not really sure how much I'm picking up with all these weird bugs happening that I have to deal with; I'm learning more about debugging rather than how to properly use Drupal on a working website, but maybe this is just part of the process?  
+
+11/28/2016 - Added new taxonomy terms for card values and card suits, and their corresponding terms (i.e. king, jack, etc. and clubs, diamonds, hearts, spades).  Created field_taxonmyterm entity reference in the Article content type, and some mock Articles to try to experiment with views.  I created a view block on the side bar that filters with the taxonomy term vocabularies I created, but it isn't as fine-grained as I would like since I'm not sure how to use the contextual filter properly.  I kind of does the job, but is not very specific.    I downloaded the modules for panels, panelizer, ctools, and layout_plugin via drush, did a git push and then moved the code to stage... we'll see how that goes once I start using it.  I also updated Drupal Core to 8.2.3 locally, in dev, and in stage.  There was some issue with cron and webprofiler in the logs but then after the update it said it was run, so it seems okay and is probably nothing.
+
+12/5/2016 - I tested out panelizer, but it only works in Bartik, and not Omega so I guess I'm sticking with that basic theme for now until I come up with a custom theme.  Panels seems useful for users to customize their posts more easily, but I need to look at Rules and Web Services too.  As far as which theme to use, Bartik also eliminates the issues I had in Omega with leaving comments for a post (there were weird errors that happened in Omega under comments, seemed like bare HTML code and errors that appeared under the comment box that was ugly).  This week, I'm mainly catching up on watching videos in preparation for the final check-in right now (custom module and theme).
+
+12/15/2016 - Upgraded Drupal core to 8.2.4.  Followed along with video to make a custom module that places a block with text, but unable to test locally due to errors in loading my website locally after the Drupal core upgrade (see documentation); therefore, I uploaded the files to stage to test, which is not ideal... I tried to load "My First Block" onto the block layout, but it didn't show up.  I tried uninstalling "My First Module" on the module list (to try to reinstall it), but then an error showed up saying that I can't the website can't be loaded when I click "Uninstall" under modules.
+
+Apparently a bunch of my modules like Devel are out of date, so I'm going to try updated that... drush up devel webform and workflow.  After the module updates, the local site is still not loading properly.  I am just going to push the module updates up to stage see what happens, maybe "My First Block" will show up as an option at least....
+
+"My First Block" doesn't show up.  I also can't access Config on the Dev environment.
+
+Enabled Block Example module in the Dev environment on Acquia cloud... That seemed to make it appear, so I'll do that in the local environment now.  I guess I didn't follow the video as closely as I thought... Anyway, for whatever reason config isn't working so that's an issue... we'll see how this goes.  At least I can try to add a custom module.
+
+Actually, extend doesn't work in the local environment anymore, so nevermind... still developing in Dev environment on Acquia cloud.  Drush still works locally though, so at least I can still install modules and try them out.
+
+12/18/2016 - Looks like my local environment wasn't working because some other program was using port 3306, so mySQL couldn't access it.  After a restart of the computer it works fine.
+
+Successfully added a hook to my_module; I will try to add a hook that changes the content of a node as well... I am calling the module custom_node.  Apparently I need to install devel_node_access, so did that too.
+
+12/19/2016 - I tried following along on the video tutorial for adding a custom module and a hook, and played around with things on my own, but nothing worked with what I tried; it's probably a matter of understanding how the controller and routing interacts with the module parameters, and what arguments Drupal looks for to successfully render what I coded.  I've decided to just look at other code and use it as a blueprint for understanding what is going on.  I had tried changing the actual body of a node with the 'entity_node_view' hook, but that didn't really do anything and I just got errors.  I am just following along on this video tutorial and changing up some of the code in the 'custom_node.module' file based on this person's example: https://buildamodule.com/video/drupal-8-developer-prep-building-a-simple-drupal-8-module-adding-a-hook-page-alter-and-hook-form-alter-to-our-module#viewing
+
+The hook page alter didn't work (I think) but the hook-form-alter did work.  I altered the html in the tutorial video's code to change the text that was outputted to the search form.
+
+I'm also tested out the form example module on https://www.drupal.org/docs/7/howtos/how-to-make-a-simple-module-with-a-form-and-menu-link.  This doesn't show up on my site though, so the lines of code from there don't seem to do much... the code is in custom_node.module, at the end, but I was just toying with it and copy/pasted all the last few form hooks into there to see if it did anything.  It didn't seem to work.
+
+I have added a my_theme theme, following along with the tutorial video.  I tried uploading my own logo.svg file, just to see if it would work.  It didn't work, the logo didn't load.  The svg file shows up on my linux system, but not on the local site.  It would have been nice if it loaded, but I guess this is typical of Drupal to have restrictions on how things load.  I uploaded the files to dev and the logo image appears.  I don't know what's wrong with my local site setup... eh well.
+
+Just a disclaimer, I did not write all of my own code for the templates, but wanted to try to do a little bit of Twig to see how it works, as I don't really have too much time to be creative or learn it properly from the videos in a few hours, so I have just decided to experiment a little bit with it by referring to what I am able to google.  I've been behind the whole semester, ever since I took a whole month to figure out how to set up an environment that works with drush (to try to learn the "proper" way to develop with Drupal.  I am referring to an online manual to try to understand it a bit more, but the code I'm toying with on my site is pulled from page 202 and 203 of this (very informative and useful looking) resource that I googled, "Drupal 8 Theming With Twig": https://cldup.com/XWGNta8nLf.pdf.  I will save this pdf for future reference.  Anyway, the code I'm trying to use doesn't seem to be doing anything at all, although it did create a Title Page region with a page title block....  nothing too special.  I added two custom_node blocks under the Title Bar region that was created, and it seems to render the page title and the two nodes fine.  I'm not sure if it did anything special, but it seems to work.  The template files are under themes/my_theme/templates.  Actually, I had to a little bit of editing of what was in the manual, since the footers and sidebars weren't included and my custom_node's hook alter didn't change the search form (since it didn't show up on the page with no sidebar), so I added sidebar twig code to that.
+
+Okay, so I pushed the files from dev to stage, and the stage site worked for a little bit then died.  I am including an archive dump in my submission.  I might have removed the block for logging in? Apparently going to localhost/user/login will log you in.
